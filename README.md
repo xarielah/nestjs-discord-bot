@@ -1,3 +1,3 @@
-<h3 align="center">Nestjs based multi-functional service<h3>
+<h3 align="center">Nestjs based multi-functional service</h3>
 
 This Nestjs application is basically a simple *Cron job*, that implements a simple flow of querying an api endpoint, storing the result in a database and refreshing a memory cache in the app. Also, it uses as a *Discord bot* to fetch the same fetched api, and return it's live response. And this service also uses as a *Web service* serving a web page, that use's the memory cache to display the calculated and cached data.
