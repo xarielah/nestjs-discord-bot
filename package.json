@@ -26,6 +26,7 @@
     "@nestjs/core": "^10.0.0",
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/schedule": "^4.0.2",
+    "@nestjs/serve-static": "^4.0.2",
     "discord.js": "^14.15.2",
     "mongoose": "^8.3.3",
     "reflect-metadata": "^0.2.0",
