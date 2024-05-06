@@ -12,7 +12,7 @@ export class CronService {
     private readonly calcService: CalcService,
   ) {}
 
-  @Cron(CronExpression.EVERY_5_SECONDS)
+  @Cron(CronExpression.EVERY_10_MINUTES)
   public async handleCron() {
     try {
       const sd = await this.roleplayService.getServerDetails();
