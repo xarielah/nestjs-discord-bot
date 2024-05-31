@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { AuditDocument } from 'src/database/types/audit.types';
 import { CacheService } from './cache.service';
 import { CalcByHourDocument } from './calc.types';
 
 @Injectable()
 export class CalcService {
+  private logger = new Logger('CalcService');
   constructor(private readonly cacheService: CacheService) {}
   /**
    * Given an array of audit documents, return the average number of players.
@@ -32,6 +33,7 @@ export class CalcService {
     this.cacheService.setData<CalcByHourDocument>(averageByHour);
     this.cacheService.setStartDate(data[0].time);
     this.cacheService.setEndDate(data[data.length - 1].time);
+    this.logger.debug(`Cached average by hour data.`);
     return averageByHour;
   }
 

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { CacheService } from 'src/cache/cache.service';
 import { CalcService } from 'src/cache/calc.service';
 import { CalcByHourDocument } from 'src/cache/calc.types';
@@ -8,6 +8,7 @@ import { AuditDocument, AuditPayload } from '../types/audit.types';
 @Injectable()
 export class AuditService {
   private _data = [];
+  private logger = new Logger('AuditService');
   constructor(
     private readonly calcService: CalcService,
     private readonly cacheService: CacheService,
@@ -19,6 +20,7 @@ export class AuditService {
   public async addNew(payload: AuditPayload): Promise<AuditDocument> {
     const audit = new Audit({ players: payload.players, time: payload.time });
     await audit.save();
+    this.logger.debug(`New audit ${audit._id.toString()} record added.`);
     return audit;
   }
 
