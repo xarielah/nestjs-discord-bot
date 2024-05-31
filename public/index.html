@@ -138,13 +138,41 @@
                 }
             }
         });
+
+        function setCookie(cname, cvalue, d) {
+            let expires = "expires=" + d.toUTCString();
+            document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+        }
+
+        function getCookie(cname) {
+            let name = cname + "=";
+            let ca = document.cookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+        }
+
         function refreshData() {
             const type = document.getElementById('data-type').value;
             const sanitizedDayValue = type === 'hourly' ? null : type;
+            const cachedCookie = getCookie(type);
+            if (cachedCookie) {
+                destroyChart();
+                return getGraph({ data: JSON.parse(cachedCookie) }, capitalizeFirstLetter(sanitizedDayValue), colorByDay(sanitizedDayValue))
+            }
             fetch(`/api/data/${type}`)
                 .then(res => res.json())
                 .then(destroyChart)
                 .then((res) => getGraph(res, capitalizeFirstLetter(sanitizedDayValue), colorByDay(sanitizedDayValue)))
+                // Cache result for 10 minutes as a cookie, another way to reduce load from the server
+                .then((res) => setCookie(type, JSON.stringify(res.data), new Date(Date.now() + 1000 * 60 * 10)))
         }
 
         function capitalizeFirstLetter(string) {
