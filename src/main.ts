@@ -6,6 +6,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   // Connect to MongoDB database
   await mongoose.connect(process.env.MONGODB_URI || '');
-  await app.listen(process.env.PORT || 3000);
+  const PORT = +process.env.PORT;
+  await app.listen(PORT || 3000); // PRD = 42069
 }
 bootstrap();
