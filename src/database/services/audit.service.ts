@@ -2,6 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { CacheService } from 'src/cache/cache.service';
 import { CalcService } from 'src/cache/calc.service';
 import { CalcByHourDocument } from 'src/cache/calc.types';
+import { DaysCacheService } from 'src/cache/days-cache.service';
+import { DayParam } from 'src/data-api/data-api.controller';
 import { Audit } from '../schemas/audit.schema';
 import { AuditDocument, AuditPayload } from '../types/audit.types';
 
@@ -12,6 +14,7 @@ export class AuditService {
   constructor(
     private readonly calcService: CalcService,
     private readonly cacheService: CacheService,
+    private readonly daysCacheService: DaysCacheService,
   ) {}
   /**
    * Gets the numbers of players queried, and saves the data into the database.
@@ -61,5 +64,40 @@ export class AuditService {
     await this.fetchAll();
     this.calcService.calcAvgByHourAndCache(this._data);
     return this.cacheService.toObject<CalcByHourDocument>();
+  }
+
+  public async getDataByDay(day: DayParam) {
+    const mappedDay = this.mapDays(day);
+    const cachedData =
+      this.daysCacheService.toObject<CalcByHourDocument>(mappedDay);
+    // If the data is already cached, return it
+    if (cachedData && cachedData.data) return cachedData;
+    // Fetch all records
+    const all = await this.fetchAll();
+    // Calculate the average by day and cache it
+    this.calcService.calcAvgByDayAndCache(all);
+    // Retry to fetch cache
+    return this.daysCacheService.toObject<CalcByHourDocument>(mappedDay);
+  }
+
+  private mapDays(value: string): number {
+    switch (value) {
+      case 'monday':
+        return 1;
+      case 'tuesday':
+        return 2;
+      case 'wednesday':
+        return 3;
+      case 'thursday':
+        return 4;
+      case 'friday':
+        return 5;
+      case 'saturday':
+        return 6;
+      case 'sunday':
+        return 0;
+      default:
+        return 0;
+    }
   }
 }

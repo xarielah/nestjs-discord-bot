@@ -2,6 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CalcByHourDocument } from 'src/cache/calc.types';
 import { AuditService } from 'src/database/services/audit.service';
 import { DataResponse } from '../cache/cache.types';
+import { DayParam } from './data-api.controller';
 
 @Injectable()
 export class DataApiService {
@@ -17,5 +18,11 @@ export class DataApiService {
     } catch (error) {
       throw new InternalServerErrorException();
     }
+  }
+
+  public async getDataByDay(day: DayParam): Promise<DataResponse<any>> {
+    try {
+      return this.auditService.getDataByDay(day);
+    } catch (error) {}
   }
 }

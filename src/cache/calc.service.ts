@@ -2,11 +2,15 @@ import { Injectable, Logger } from '@nestjs/common';
 import { AuditDocument } from 'src/database/types/audit.types';
 import { CacheService } from './cache.service';
 import { CalcByHourDocument } from './calc.types';
+import { DaysCacheService } from './days-cache.service';
 
 @Injectable()
 export class CalcService {
   private logger = new Logger('CalcService');
-  constructor(private readonly cacheService: CacheService) {}
+  constructor(
+    private readonly cacheService: CacheService,
+    private readonly daysCacheService: DaysCacheService,
+  ) {}
   /**
    * Given an array of audit documents, return the average number of players.
    * @param {AuditDocument[]} data
@@ -36,6 +40,17 @@ export class CalcService {
     this.logger.debug(`Cached average by hour data.`);
     return averageByHour;
   }
-
-  public averageByHours;
+  public calcAvgByDayAndCache(data: AuditDocument[]): void {
+    for (let i = 0; i < 7; i++) {
+      const cachedData = this.daysCacheService.getDataByDay(i);
+      if (!cachedData || new Date().getDay() === i) {
+        const filteredData = data.filter(
+          (audit) => new Date(audit.time).getDay() === i,
+        );
+        const avgCalc = this.calcAvgByHourAndCache(filteredData);
+        this.daysCacheService.setDayData(avgCalc, i);
+      }
+    }
+    this.logger.debug(`Cached average by day data.`);
+  }
 }

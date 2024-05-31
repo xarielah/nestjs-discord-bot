@@ -75,7 +75,21 @@
             </p>
         </article>
         <div>
-            <canvas id="myChart"></canvas>
+            <select
+                class="px-4 py-1 rounded-md shadow-lg shadow-white/5 cursor-pointer bg-zinc-800 text-zinc-400 border-[1px] border-zinc-400/20"
+                id="data-type" onchange="refreshData()">
+                <option value="hourly">All Time Hourly</option>
+                <option value="sunday">Daily: Sunday</option>
+                <option value="monday">Daily: Monday</option>
+                <option value="tuesday">Daily: Tuesday</option>
+                <option value="wednesday">Daily: Wednesday</option>
+                <option value="thursday">Daily: Thursday</option>
+                <option value="friday">Daily: Friday</option>
+                <option value="saturday">Daily: Saturday</option>
+            </select>
+        </div>
+        <div>
+            <canvas id="data-chart"></canvas>
         </div>
     </main>
     <footer class="p-4 text-center flex items-center justify-center flex-col gap-2">
@@ -98,15 +112,71 @@
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        let chart;
+        let chartConfig = (data, day, color) => ({
+            type: 'bar',
+            data: {
+                labels: data.map(d => d.hour),
+                datasets: [{
+                    label: '# of players' + (day ? ` at ${day}` : ""),
+                    data: data.map(d => d.players),
+                    borderWidth: .2,
+                    backgroundColor: color || '#FF2E63',
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Number of RP players grouped by time (10 minutes intervals)'
+                    }
+                }
+            }
+        });
+        function refreshData() {
+            const type = document.getElementById('data-type').value;
+            const sanitizedDayValue = type === 'hourly' ? null : type;
+            fetch(`/api/data/${type}`)
+                .then(res => res.json())
+                .then(destroyChart)
+                .then((res) => getGraph(res, capitalizeFirstLetter(sanitizedDayValue), colorByDay(sanitizedDayValue)))
+        }
+
+        function capitalizeFirstLetter(string) {
+            if (typeof string !== "string") return ""
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
+        function colorByDay(day) {
+            if (day === 'sunday') return '#94FFD8'
+            if (day === 'monday') return '#B2C8DF'
+            if (day === 'tuesday') return '#FFFBDA'
+            if (day === 'wednesday') return '#FFEC9E'
+            if (day === 'thursday') return '#F7A76C'
+            if (day === 'friday') return '#FC819E'
+            if (day === 'saturday') return '#FF6969'
+            return ""
+        }
+
         const res = fetch('/api/data/hourly')
             .then(res => res.json())
             .then(getGraph)
             .then(setDataIntegrity)
 
+        function destroyChart(res) {
+            const ctx = document.getElementById('data-chart');
+            chart.destroy();
+            return res;
+        }
+
         function setDataIntegrity(res) {
             const { data, startDate, endDate } = res
             const first = document.getElementById('first');
-            console.log("🚀 ~ setDataIntegrity ~ first:", first)
             const last = document.getElementById('last');
             if (startDate && endDate) {
                 first.innerText = new Date(startDate).toLocaleDateString("he-IL");
@@ -115,34 +185,10 @@
             return res;
         }
 
-        function getGraph(res) {
+        function getGraph(res, day, color) {
             const { data } = res;
-            const ctx = document.getElementById('myChart');
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: data.map(d => d.hour),
-                    datasets: [{
-                        label: '# of Players',
-                        data: data.map(d => d.players),
-                        borderWidth: .2,
-                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    },
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: 'Number of RP players grouped by time (10 minutes intervals)'
-                        }
-                    }
-                }
-            });
+            const ctx = document.getElementById('data-chart');
+            chart = new Chart(ctx, chartConfig(data, day, color));
             return res;
         }
     </script>
