@@ -51,6 +51,5 @@ export class CalcService {
         this.daysCacheService.setDayData(avgCalc, i);
       }
     }
-    this.logger.debug(`Cached average by day data.`);
   }
 }

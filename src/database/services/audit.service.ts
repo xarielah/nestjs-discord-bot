@@ -71,11 +71,9 @@ export class AuditService {
     const cachedData =
       this.daysCacheService.toObject<CalcByHourDocument>(mappedDay);
     // If the data is already cached, return it
-    if (cachedData && cachedData.data) return cachedData;
-    // Fetch all records
-    const all = await this.fetchAll();
+    if (cachedData.data) return cachedData;
     // Calculate the average by day and cache it
-    this.calcService.calcAvgByDayAndCache(all);
+    this.calcService.calcAvgByDayAndCache(this._data);
     // Retry to fetch cache
     return this.daysCacheService.toObject<CalcByHourDocument>(mappedDay);
   }

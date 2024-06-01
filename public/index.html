@@ -75,21 +75,24 @@
             </p>
         </article>
         <div>
-            <select
-                class="px-4 py-1 rounded-md shadow-lg shadow-white/5 cursor-pointer bg-zinc-800 text-zinc-400 border-[1px] border-zinc-400/20"
-                id="data-type" onchange="refreshData()">
-                <option value="hourly">All Time Hourly</option>
-                <option value="sunday">Daily: Sunday</option>
-                <option value="monday">Daily: Monday</option>
-                <option value="tuesday">Daily: Tuesday</option>
-                <option value="wednesday">Daily: Wednesday</option>
-                <option value="thursday">Daily: Thursday</option>
-                <option value="friday">Daily: Friday</option>
-                <option value="saturday">Daily: Saturday</option>
-            </select>
-        </div>
-        <div>
             <canvas id="data-chart"></canvas>
+        </div>
+        <div class="items-center gap-4 text-left w-full justify-center my-4">
+            <div class="mx-auto flex flex-col gap-2 max-w-[200px]">
+                <label for="data-type" class="cursor-pointer">Data Select:</label>
+                <select
+                    class="px-4 py-1 rounded-md shadow-lg shadow-white/5 cursor-pointer bg-zinc-800 text-zinc-400 border-[1px] border-zinc-400/20"
+                    id="data-type" onchange="refreshData()">
+                    <option value="hourly">All Time</option>
+                    <option value="sunday">Sunday</option>
+                    <option value="monday">Monday</option>
+                    <option value="tuesday">Tuesday</option>
+                    <option value="wednesday">Wednesday</option>
+                    <option value="thursday">Thursday</option>
+                    <option value="friday">Friday</option>
+                    <option value="saturday">Saturday</option>
+                </select>
+            </div>
         </div>
     </main>
     <footer class="p-4 text-center flex items-center justify-center flex-col gap-2">
