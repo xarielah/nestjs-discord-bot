@@ -15,7 +15,6 @@ export class CronService {
 
   @Cron(CronExpression.EVERY_10_MINUTES)
   public async handleCron() {
-    this.logger.debug('');
     this.logger.debug('=== Cron Job Started ===');
     try {
       const sd = await this.roleplayService.getServerDetails();
